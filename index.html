@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+        <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" name="viewport" />
+        <meta content="yes" name="apple-mobile-web-app-capable" />
+        <title>ATS Interactive</title>
+        <script src="data/common/script.js"></script>
+        <script src="data/player/player.js"></script>
+
+        <!-- Include Font Awesome for icons -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+        <style type="text/css">
+            .DC1 { top: 0px; left: 0px; height: 100%; width: 100%; opacity: 1; }
+            .DC0 { top: 0px; left: 0px; height: 100%; width: 100%; opacity: 0; }
+            ::selection { background-color: transparent; }
+            ::-moz-selection { } canvas { position: absolute; } 
+            div, iframe { position: absolute; }
+            pre { position: absolute; margin: 0px; letter-spacing: -0.04px; -ms-transform-origin: 0 0; -webkit-transform-origin: 0 0; -moz-transform-origin: 0 0; -o-transform-origin: 0 0; }
+            img { position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; }
+            input { -webkit-box-sizing: border-box; -moz-box-sizing: border-box; box-sizing: border-box; }
+            .transOrgin { -moz-transform-origin: 0 0; -o-transform-origin: 0 0; -webkit-transform-origin: 0px 0px; -ms-transform-origin: 0 0; }
+            #loadingImg { height: 100%; width: 100%; display: block; } 
+            #loadingImg div { left: 50%; top: 50%; width: 50px; height: 50px; margin: -25px 0 0 -25px; border-radius: 12px; background-color: rgba(255,255,255,.8); opacity: 0.8; } 
+            #inImg { height: 80% !important; width: 80% !important; margin: 10%; border-radius: 8px; }
+            #resizer { border-radius: 22px; overflow: hidden; }
+
+            /* Button styles with gradient background and colorful span icons */
+            .button-style {
+                position: absolute;
+                width: 110px;
+                height: 60px;
+                background: linear-gradient(to right, #A6A0DC, #847dbf); /* Gradient background */
+                color: black;
+                border: none;
+                border-radius: 12px;
+                padding: 5px;
+                font-size: 16px;
+                cursor: pointer;
+                text-align: left; /* Align text to the left */
+                display: flex; /* Use flexbox */
+                align-items: center; /* Vertically center the items */
+                justify-content: flex-start; /* Align items to the left */
+                gap: 10px; /* Space between icon and text */
+                box-shadow: 
+                    3px 3px 8px rgba(0, 0, 0, 0.15),
+                    inset -3px -3px 8px rgba(255, 255, 255, 0.3),
+                    inset 3px 3px 8px rgba(0, 0, 0, 0.2);
+                transition: box-shadow 0.2s ease-in-out, transform 0.2s ease;
+            }
+
+            .button-style:hover {
+                opacity: 0.9;
+                box-shadow: 
+                    3px 3px 12px rgba(0, 0, 0, 0.25),
+                    inset -4px -4px 10px rgba(255, 255, 255, 0.4),
+                    inset 4px 4px 10px rgba(0, 0, 0, 0.3);
+                transform: translateY(-2px);
+            }
+
+            .button-style:active {
+                box-shadow: 
+                    3px 3px 6px rgba(0, 0, 0, 0.2),
+                    inset 1px 1px 4px rgba(255, 255, 255, 0.3);
+                transform: translateY(2px);
+            }
+
+            #fullscreenButton {
+                top: 10px; 
+                right: 10px;
+                margin-left: 5px; /* Space between button and content below */
+            }
+
+            #practiceFormButton {
+                top: 80px; 
+                right: 10px;
+                margin-left: 15px; /* Space between the button and content above */
+            }
+
+            .button-icon {
+                font-size: 24px; /* Increase icon size */
+            }
+        </style>
+    </head>
+    <body style="position:absolute;background-color: rgb(0,0,0); height: 100%; width: 100%; overflow: hidden; margin: 0px; user-select: none; -khtml-user-select: none; -ms-user-select: none; -o-user-select: none; -webkit-user-select: none; -moz-user-select: none; -webkit-tap-highlight-color: rgba(0,0,0,0);">
+        <div id="player" style="height: 100%; width: 100%;">
+            <div id="contentHolder">
+                <div id="resizer" style="left: 0px; top: 0px; height: 540px; width: 720px; overflow: hidden; -moz-transform-origin: 0 0; -o-transform-origin: 0 0; -webkit-transform-origin: 0 0; -ms-transform-origin: 0 0;"> </div>
+            </div>
+            <div id="loadingImg"><div><img id="inImg" src="data/player/pre.gif"/></div></div>
+        </div>
+
+        <!-- Fullscreen Button -->
+        <button id="fullscreenButton" class="button-style">
+            <span class="fas fa-expand button-icon" style="color: #ffcc00;"></span>   Full<br>Screen
+        </button>
+
+        <!-- Practice Form Button -->
+        <button id="practiceFormButton" class="button-style" onclick="window.open('https://usfaa.sharepoint.com/:w:/r/sites/TMS-AFN-N-KohlerEngineGeneratorPowerSystems/Shared%20Documents/General/Visual%20Aids/ATS/ASCO%20962/40167002%20ATS%20Interactive%20practice.docx?d=w7c6432956fae44b8a51a7a988f081108&csf=1&web=1&e=ZwYK7q', '_blank');">
+            <span class="fas fa-pencil-alt button-icon" style="color: #930b0b;"></span> Practice<br>Form
+        </button>
+
+        <script>
+            const fullscreenButton = document.getElementById('fullscreenButton');
+            fullscreenButton.addEventListener('click', () => {
+                const player = document.getElementById('player');
+                if (document.fullscreenElement) {
+                    document.exitFullscreen();
+                } else if (player.requestFullscreen) {
+                    player.requestFullscreen();
+                } else if (player.mozRequestFullScreen) {
+                    player.mozRequestFullScreen();
+                } else if (player.webkitRequestFullscreen) {
+                    player.webkitRequestFullscreen();
+                } else if (player.msRequestFullscreen) {
+                    player.msRequestFullscreen();
+                }
+            });
+        </script>
+    </body>
+</html>
